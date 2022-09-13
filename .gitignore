@@ -127,3 +127,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+src/gaspropertycalculator/ui/images/Thumbs.db
+src/gaspropertycalculator/ui/images/settings_quadIcon.xcf
+src/gaspropertycalculator/ui/images/run_quadIcon.xcf
+src/gaspropertycalculator/ui/images/quit_quadIcon.xcf
+src/gaspropertycalculator/ui/images/logo.xcf
+src/gaspropertycalculator/ui/images/info_quadIcon.xcf
+src/gaspropertycalculator/ui/images/error_quadIcon.xcf
+src/gaspropertycalculator/ui/images/diagram_quadIcon.xcf
+src/gaspropertycalculator/ui/images/composition_quadIcon.xcf
+src/gaspropertycalculator/ui/images/calculator_quadIcon.xcf
+src/gaspropertycalculator/ui/images/buttonBlackStyle.xcf
+src/gaspropertycalculator/ui/images/buttonBlackStyle_clicked.xcf
+src/gaspropertycalculator/ui/images/basis_quadIcon.xcf
+src/gaspropertycalculator/ui/images/back_quadIcon.xcf
+src/gaspropertycalculator/ui/images/apply_quadIcon.xcf
