@@ -1,0 +1,60 @@
+# Python CircleCI 2.0 configuration file
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+
+    working_directory: ~/repo
+
+    steps:
+      # Step 1: obtain repo from GitHub
+      - checkout
+      # Step 2: create virtual env and install dependencies
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - run:
+          name: create whl
+          command: |  # create whl and use pipenv to install dependencies
+            python3 setup.py sdist bdist_wheel            
+            pipenv install dist/gaspropertycalculator-0.0.0-py3-none-any.whl            
+      # Step 3: run linter and tests
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+  test_pypi_publish:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout  # checkout source code to working directory
+      - run:
+          command: |  # create whl, install twine and publish to Test PyPI
+            python3 setup.py sdist bdist_wheel  
+            pipenv install twine          
+            pipenv run twine upload --repository testpypi dist/*
+  pypi_publish:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout  # checkout source code to working directory
+      - run:
+          command: |  # create whl, install twine and publish to Test PyPI
+            python3 setup.py sdist bdist_wheel  
+            pipenv install twine          
+            pipenv run twine upload dist/*
+workflows:
+  version: 2
+  build_publish:
+    jobs:
+      - build
+      #- test_pypi_publish:
+      #    requires:
+      #      - build
+      #- pypi_publish:
+      #    requires:
+      #      - build
