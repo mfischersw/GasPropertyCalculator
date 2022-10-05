@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='gaspropertycalculator',
-    version='0.0.1',
+    version='0.0.2',
     description='GasPropertyCalculator',
     long_description='GasPropertyCalculator',
     author='Michael Fischer',
