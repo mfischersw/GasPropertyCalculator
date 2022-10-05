@@ -5,4 +5,8 @@ from . import calc
 from . import data
 from . import util
 
-__all__ = ['basic', 'calc', 'data', 'util']
+__all__ = ['basic',
+           'calc',
+           'data',
+           'util',
+           ]

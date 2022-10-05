@@ -211,9 +211,6 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.ui.comboBoxDiagramsProps.currentIndexChanged.connect(
             self.show_plot_arr)
 
-        # Doc
-        self.ui.pushButtonDocu.clicked.connect(self.show_docu)
-
     def createConnectsGas(self):
         """Gui: Signal-slot connections for gas composition"""
 
@@ -453,9 +450,9 @@ class GPCMainWindow(QtWidgets.QMainWindow):
                 unit_p = unitsTarget["pc"][induni]
                 unit_T = unitsTarget["Tc"][induni]
 
-                p = unitConverter.trafo_unit(p_in, unit_p, 
+                p = unitConverter.trafo_unit(p_in, unit_p,
                                              unitConverter.Units.Pa)
-                T = unitConverter.trafo_unit(T_in, unit_T, 
+                T = unitConverter.trafo_unit(T_in, unit_T,
                                              unitConverter.Units.degK)
 
                 # Critical point
@@ -464,7 +461,8 @@ class GPCMainWindow(QtWidgets.QMainWindow):
                 isGood_p = (p > 0.0)
                 isGood_T = (T > Tcrit)
 
-            except:
+            except Exception as e:
+                print(e)
                 QtWidgets.QMessageBox.warning(
                     self, "State Input Error",
                     "The values for pressure and temperature \
@@ -499,8 +497,9 @@ class GPCMainWindow(QtWidgets.QMainWindow):
                 propDictN = self.gasobj.calc_allPropDict(pN, TN)
 
                 propDict = self.gasobj.calc_allPropDict(p, T)
-            except:
 
+            except Exception as e:
+                print(e)
                 self.setArbitraryTrivial()
                 return
 
@@ -573,7 +572,7 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.ui.radioButton_T20.setText(
             "T = " + str("{0:.2f}".format(TNVal_T20)) + " " +
             unit_T_Str + ", \t p = " +
-            str("{0:.3f}".format(pNVal_T20)) + " " + unit_p_Str)        
+            str("{0:.3f}".format(pNVal_T20)) + " " + unit_p_Str)
 
         # Output units
         self.ui.comboBoxBasicUnit_Mm.setCurrentIndex(induni)
@@ -778,7 +777,7 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         maxp = unitConverter.trafo_unit(maxp_in, unit_p,
                                         unitConverter.Units.Pa)
         minT = unitConverter.trafo_unit(minT_in, unit_T,
-                                        unitConverter.Units.degK)        
+                                        unitConverter.Units.degK)
         maxT = unitConverter.trafo_unit(maxT_in, unit_T,
                                         unitConverter.Units.degK)
 
@@ -821,7 +820,7 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         # Calculation in target units
         for ii in range(self.NT):
             TT = self.T_arr[ii]
-            
+
             for jj in range(self.Ngrid):
 
                 pp = self.p_arr[jj]
@@ -865,7 +864,7 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         maxp = unitConverter.trafo_unit(maxp_in, unit_p,
                                         unitConverter.Units.Pa)
         minT = unitConverter.trafo_unit(minT_in, unit_T,
-                                        unitConverter.Units.degK)        
+                                        unitConverter.Units.degK)
         maxT = unitConverter.trafo_unit(maxT_in, unit_T,
                                         unitConverter.Units.degK)
 
@@ -954,97 +953,130 @@ class GPCMainWindow(QtWidgets.QMainWindow):
                     unitConverter.trafo_unit(
                         self.p_arr, unitConverter.Units.Pa, unit_p),
                     unitConverter.trafo_unit(
-                        self.rho_arr[ii,:] ,unitConverter.Units.kg_m3,unitsTarget["rho"][induni]),
-                             pen=(ii,self.NT))         
+                        self.rho_arr[ii, :],
+                        unitConverter.Units.kg_m3,
+                        unitsTarget["rho"][induni]),
+                    pen=(ii, self.NT))
 
         elif (ind_arr == 1):  # Z
 
-            self.pw.setLabel('left', 'Real Gas Factor', units='')  
+            self.pw.setLabel('left', 'Real Gas Factor', units='')
 
             for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             self.Z_arr[ii,:],
-                             pen=(ii,self.NT))    
-            
-        elif (ind_arr == 2): # K
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    self.Z_arr[ii, :],
+                    pen=(ii, self.NT))
 
-            self.pw.setLabel('left', 'Compressibility', units='')  
- 
-            for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             self.K_arr[ii,:],
-                             pen=(ii,self.NT))     
+        elif (ind_arr == 2):  # K
 
-        elif (ind_arr == 3): # cp
-
-            self.pw.setLabel('left', 'Heat Cap. cp', units=unitsTarget["cp"][induniStr])  
+            self.pw.setLabel('left', 'Compressibility', units='')
 
             for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             unitConverter.trafo_unit(self.cp_arr[ii,:] ,unitConverter.Units.kJ_kgK,unitsTarget["cp"][induni]),
-                             pen=(ii,self.NT))  
-                
-        elif (ind_arr == 4): # cv
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    self.K_arr[ii, :],
+                    pen=(ii, self.NT))
 
-            self.pw.setLabel('left', 'Heat Cap. cv', units=unitsTarget["cv"][induniStr])  
+        elif (ind_arr == 3):  # cp
 
-            for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             unitConverter.trafo_unit(self.cv_arr[ii,:] ,unitConverter.Units.kJ_kgK,unitsTarget["cv"][induni]),
-                             pen=(ii,self.NT))   
-                
-        elif (ind_arr == 5): # w
-
-            self.pw.setLabel('left', 'Speed of Sound', units=unitsTarget["w"][induniStr])  
- 
-            for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             unitConverter.trafo_unit(self.w_arr[ii,:] ,unitConverter.Units.m_s,unitsTarget["w"][induni]),
-                             pen=(ii,self.NT))     
-
-        elif (ind_arr == 6): # mu
-
-            self.pw.setLabel('left', 'JT Coefficient', units=unitsTarget["mu"][induniStr])  
+            self.pw.setLabel('left', 'Heat Cap. cp',
+                             units=unitsTarget["cp"][induniStr])
 
             for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             unitConverter.trafo_unit(self.mu_arr[ii,:] ,unitConverter.Units.degK_bar,unitsTarget["mu"][induni]),
-                             pen=(ii,self.NT))   
-                
-        elif (ind_arr == 7): # kappa
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    unitConverter.trafo_unit(
+                        self.cp_arr[ii, :],
+                        unitConverter.Units.kJ_kgK,
+                        unitsTarget["cp"][induni]),
+                    pen=(ii, self.NT))
 
-            self.pw.setLabel('left', 'Isentropic Exponent', units='')  
-            
+        elif (ind_arr == 4):  # cv
+
+            self.pw.setLabel('left', 'Heat Cap. cv',
+                             units=unitsTarget["cv"][induniStr])
+
             for ii in range(self.NT):
-                self.plotList[ii] = self.pw.plot(unitConverter.trafo_unit(self.p_arr,unitConverter.Units.Pa,unit_p),
-                             self.kappa_arr[ii,:],
-                             pen=(ii,self.NT))  
-                
-        else:
-            # ...
-            pass
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    unitConverter.trafo_unit(
+                        self.cv_arr[ii, :],
+                        unitConverter.Units.kJ_kgK,
+                        unitsTarget["cv"][induni]),
+                    pen=(ii, self.NT))
 
-        # Clear legend   
+        elif (ind_arr == 5):  # w
+
+            self.pw.setLabel('left', 'Speed of Sound',
+                             units=unitsTarget["w"][induniStr])
+
+            for ii in range(self.NT):
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    unitConverter.trafo_unit(
+                        self.w_arr[ii, :],
+                        unitConverter.Units.m_s,
+                        unitsTarget["w"][induni]),
+                    pen=(ii, self.NT))
+
+        elif (ind_arr == 6):  # mu
+
+            self.pw.setLabel('left', 'JT Coefficient',
+                             units=unitsTarget["mu"][induniStr])
+
+            for ii in range(self.NT):
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    unitConverter.trafo_unit(
+                        self.mu_arr[ii, :],
+                        unitConverter.Units.degK_bar,
+                        unitsTarget["mu"][induni]),
+                    pen=(ii, self.NT))
+
+        elif (ind_arr == 7):  # kappa
+
+            self.pw.setLabel('left', 'Isentropic Exponent', units='')
+
+            for ii in range(self.NT):
+                self.plotList[ii] = self.pw.plot(
+                    unitConverter.trafo_unit(
+                        self.p_arr, unitConverter.Units.Pa, unit_p),
+                    self.kappa_arr[ii, :],
+                    pen=(ii, self.NT))
+
+        # Clear legend
         try:
-            self.pw.getPlotItem().legend.scene().removeItem(self.pw.getPlotItem().legend)
-        except:
-            pass
-             
+            self.pw.getPlotItem().legend.scene().removeItem(
+                self.pw.getPlotItem().legend)
+        except Exception as e:
+            print(e)
+
         self.pw.addLegend()
-        l = self.pw.getPlotItem().legend
+        leg = self.pw.getPlotItem().legend
 
         try:
             self.pw.getPlotItem().legend.items = []
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
-        l.items= []
+        leg.items = []
 
         # Legend entries
         for ii in range(self.NT):
-            l.addItem(self.plotList[ii], str("{0:.1f}".format(unitConverter.trafo_unit(self.T_arr[ii],unitConverter.Units.degK,unit_T)) + " " + unit_T_Str))
-   
-                    
+            leg.addItem(
+                self.plotList[ii], str("{0:.1f}".format(
+                    unitConverter.trafo_unit(
+                        self.T_arr[ii],
+                        unitConverter.Units.degK,
+                        unit_T)) + " " + unit_T_Str))
+
     @QtCore.pyqtSlot()
     def show_plot_arr_hs(self):
 
@@ -1057,10 +1089,10 @@ class GPCMainWindow(QtWidgets.QMainWindow):
             return
 
         # units p,T ???
-        (induni,induniStr) = self.determine_induni()
+        (induni, induniStr) = self.determine_induni()
 
-        unit_p = unitsTarget["pc"][induni]
-        unit_p_Str = unitsTarget["pc"][induniStr]
+        # unit_p = unitsTarget["pc"][induni]
+        # unit_p_Str = unitsTarget["pc"][induniStr]
         unit_T = unitsTarget["Tc"][induni]
         unit_T_Str = unitsTarget["Tc"][induniStr]
 
@@ -1069,53 +1101,70 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         unit_h = unitsTarget["h"][induni]
         unit_h_Str = unitsTarget["h"][induniStr]
 
-        self.pw_hs.setLabel('bottom', 'Entropy', units=unit_s_Str)                         
-        self.pw_hs.setLabel('left', 'Enthalpy', units=unit_h_Str)  
-            
-        for ii in range(self.NT_hs): ### legend ???
-            self.plotList_hs[ii] = self.pw_hs.plot(unitConverter.trafo_unit(self.s_arr[ii,:],unitConverter.Units.kJ_kgK,unit_s),
-                            unitConverter.trafo_unit(self.h_arr[ii,:] ,unitConverter.Units.kJ_kg,unit_h),
-                            pen=(ii,self.NT_hs)) 
+        self.pw_hs.setLabel('bottom', 'Entropy', units=unit_s_Str)
+        self.pw_hs.setLabel('left', 'Enthalpy', units=unit_h_Str)
 
-        for ii in range(self.Ngrid_hs): ### legend ???
-            self.pw_hs.plot(unitConverter.trafo_unit(self.s_arr[:,ii],unitConverter.Units.kJ_kgK,unit_s),
-                            unitConverter.trafo_unit(self.h_arr[:,ii] ,unitConverter.Units.kJ_kg,unit_h),
-                            pen=(ii,self.NT_hs))
-                            
-        # Clear legend   
+        for ii in range(self.NT_hs):
+            self.plotList_hs[ii] = self.pw_hs.plot(
+                unitConverter.trafo_unit(
+                    self.s_arr[ii, :],
+                    unitConverter.Units.kJ_kgK,
+                    unit_s),
+                unitConverter.trafo_unit(
+                    self.h_arr[ii, :],
+                    unitConverter.Units.kJ_kg,
+                    unit_h),
+                pen=(ii, self.NT_hs))
+
+        for ii in range(self.Ngrid_hs):
+            self.pw_hs.plot(
+                unitConverter.trafo_unit(
+                    self.s_arr[:, ii],
+                    unitConverter.Units.kJ_kgK,
+                    unit_s),
+                unitConverter.trafo_unit(
+                    self.h_arr[:, ii],
+                    unitConverter.Units.kJ_kg,
+                    unit_h),
+                pen=(ii, self.NT_hs))
+
+        # Clear legend
         try:
-            self.pw_hs.getPlotItem().legend.scene().removeItem(self.pw_hs.getPlotItem().legend)
-        except:
-            pass
-             
+            self.pw_hs.getPlotItem().legend.scene().removeItem(
+                self.pw_hs.getPlotItem().legend)
+        except Exception as e:
+            print(e)
+
         self.pw_hs.addLegend()
-        l = self.pw_hs.getPlotItem().legend
+        leg = self.pw_hs.getPlotItem().legend
 
         try:
             self.pw_hs.getPlotItem().legend.items = []
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
-        l.items= []
+        leg.items = []
 
         # Legend entries
         for ii in range(self.NT_hs):
-            l.addItem(self.plotList_hs[ii], str("{0:.1f}".format(unitConverter.trafo_unit(self.T_arr_hs[ii],unitConverter.Units.degK,unit_T)) + " " + unit_T_Str))
-                
+            leg.addItem(self.plotList_hs[ii], str("{0:.1f}".format(
+                unitConverter.trafo_unit(
+                    self.T_arr_hs[ii],
+                    unitConverter.Units.degK,
+                    unit_T)) + " " + unit_T_Str))
 
     def emptyDiag(self):
 
-        self.pw.setLabel('bottom', 'Pressure', units='')        
-        self.pw.setLabel('left', 'Property', units='')  
+        self.pw.setLabel('bottom', 'Pressure', units='')
+        self.pw.setLabel('left', 'Property', units='')
         self.pw.setXRange(0.0, 1.0)
         self.pw.setYRange(0.0, 1.0)
         self.pw.enableAutoRange()
-    
 
     def emptyDiag_hs(self):
 
-        self.pw_hs.setLabel('bottom', 'Entropy', units='')        
-        self.pw_hs.setLabel('left', 'Enthalpy', units='')  
+        self.pw_hs.setLabel('bottom', 'Entropy', units='')
+        self.pw_hs.setLabel('left', 'Enthalpy', units='')
         self.pw_hs.setXRange(0.0, 1.0)
         self.pw_hs.setYRange(0.0, 1.0)
         self.pw_hs.enableAutoRange()
@@ -1125,65 +1174,60 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.NT = 5
         self.Ngrid = 20
 
-        self.rho_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.Z_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.K_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.cp_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.cv_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.w_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.mu_arr = numpy.zeros((self.NT,self.Ngrid))
-        self.kappa_arr = numpy.zeros((self.NT,self.Ngrid))
-
+        self.rho_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.Z_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.K_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.cp_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.cv_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.w_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.mu_arr = numpy.zeros((self.NT, self.Ngrid))
+        self.kappa_arr = numpy.zeros((self.NT, self.Ngrid))
 
     def initGrid_hs(self):
 
         self.NT_hs = 5
         self.Ngrid_hs = 20
 
-        self.s_arr = numpy.zeros((self.NT_hs,self.Ngrid_hs))
-        self.h_arr = numpy.zeros((self.NT_hs,self.Ngrid_hs))
-  
+        self.s_arr = numpy.zeros((self.NT_hs, self.Ngrid_hs))
+        self.h_arr = numpy.zeros((self.NT_hs, self.Ngrid_hs))
 
     def initDiag(self):
 
         self.pw = self.ui.graphicsView
-        self.pw.setMouseEnabled(x=False,y=False)        
+        self.pw.setMouseEnabled(x=False, y=False)
         self.pw.plot()
         self.pw.enableAutoRange()
         self.pw.hideButtons()
         self.setMinMaxValsForAxes()
-        self.emptyDiag() 
+        self.emptyDiag()
         self.plotList = [None]*self.NT
         self.pw.addLegend()
-   
 
     def initDiag_hs(self):
 
         self.pw_hs = self.ui.graphicsView_hs
-        self.pw_hs.setMouseEnabled(x=False,y=False)        
+        self.pw_hs.setMouseEnabled(x=False, y=False)
         self.pw_hs.plot()
         self.pw_hs.enableAutoRange()
         self.pw_hs.hideButtons()
         self.setMinMaxValsForAxes_hs()
-        self.emptyDiag_hs() 
+        self.emptyDiag_hs()
         self.plotList_hs = [None]*self.NT_hs
         self.pw.addLegend()
 
-    def clearLegend(self): 
+    def clearLegend(self):
 
         try:
             self.pw.getPlotItem().legend.items = []
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
- 
-    def clearLegend_hs(self): 
+    def clearLegend_hs(self):
 
         try:
             self.pw_hs.getPlotItem().legend.items = []
-        except:
-            pass
-
+        except Exception as e:
+            print(e)
 
     def setBasicTrivial(self):
 
@@ -1194,9 +1238,8 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.Hi = 0.0
         self.Hs = 0.0
 
-
     def setNormTrivial(self):
-        
+
         self.rhoN = 0.0
         self.ZN = 0.0
         self.KN = 0.0
@@ -1206,96 +1249,73 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.muN = 0.0
         self.kappaN = 0.0
 
-
     def setArbitraryTrivial(self):
-        
-        self.rho     = 0.0
-        self.Z       = 0.0
-        self.K       = 0.0
-        self.cp      = 0.0
-        self.cv      = 0.0
-        self.w       = 0.0
-        self.mu      = 0.0
-        self.kappa   = 0.0
 
+        self.rho = 0.0
+        self.Z = 0.0
+        self.K = 0.0
+        self.cp = 0.0
+        self.cv = 0.0
+        self.w = 0.0
+        self.mu = 0.0
+        self.kappa = 0.0
 
     def determine_induni(self):
 
         if (self.ui.radioButtonUnitMetric.isChecked()):
-            induni = 0                 
+            induni = 0
         else:
             induni = 1
 
         induniStr = induni + 2
 
-        return (induni,induniStr)
-
+        return (induni, induniStr)
 
     def determine_normCond(self):
 
         if (self.ui.radioButton_T0.isChecked()):
-            return data.normConditions["de0"]  
+            return data.normConditions["de0"]
         elif (self.ui.radioButton_T15.isChecked()):
-            return data.normConditions["de15"]                
+            return data.normConditions["de15"]
         else:
-            return data.normConditions["de20"] 
-
+            return data.normConditions["de20"]
 
     def set_normCondLabel(self):
 
         if (self.ui.radioButton_T0.isChecked()):
             condText = self.ui.radioButton_T0.text()
         elif (self.ui.radioButton_T15.isChecked()):
-            condText = self.ui.radioButton_T15.text()            
+            condText = self.ui.radioButton_T15.text()
         else:
             condText = self.ui.radioButton_T20.text()
-        
-        self.ui.labelNormStateDef.setText( "Norm state definition: \t " + str(condText) )
 
-
-    @QtCore.pyqtSlot()
-    def show_docu(self):
-        
-        documentation_name = 'Documentation_GasPropertyCalculator.pdf'
-
-        if getattr(sys, 'frozen', False):
-            application_path = os.path.dirname(sys.executable)
-        elif __file__:
-            application_path = os.path.dirname(__file__)
-
-        documentation_path = os.path.join(application_path, documentation_name)
-
-        try:
-            QtGui.QDesktopServices.openUrl(QtCore.QUrl( "file:///" + documentation_path , QtCore.QUrl.TolerantMode))
-        except:
-            #...
-            pass
-
-
-    ## model-view: specific routines
+        self.ui.labelNormStateDef.setText(
+            "Norm state definition: \t " + str(condText))
 
     def setupTableModelsSpec(self):
         """Setup specific table model (gas, boundaries)"""
 
         # table model gas
-        (self.modelGas, self.selectionModelGas) = generics.setupTableModelGen(self,"Component","Fraction [mol%]")
-
+        (self.modelGas,
+         self.selectionModelGas) = generics.setupTableModelGen(
+            self, "Component", "Fraction [mol%]")
 
     def setupTableViewsSpec(self):
         """Setup specific table views (gas, boundaries)"""
 
         # table view gas
-        generics.setupTableViewGen(self.ui.tableViewGas, self.modelGas, self.selectionModelGas)
-
-    ## init routines
+        generics.setupTableViewGen(
+            self.ui.tableViewGas,
+            self.modelGas,
+            self.selectionModelGas)
 
     def initTableModelsSpec(self):
         """Gui: init table models (gas boundaries)"""
 
         # gas
-        self.updateLabelStatusGas(parameters.ID_STATUSGAS_FRACTIONSUM_OUTRANGE,{})  
+        self.updateLabelStatusGas(
+            parameters.ID_STATUSGAS_FRACTIONSUM_OUTRANGE, {})
         self.initGasComponents()
-
 
     def initGasComponents(self):
         """Gui: init table model gas"""
@@ -1303,10 +1323,16 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         for ii in range(dataGui.nDataTabGasComponents):
 
             self.modelGas.insertRows(ii, 1, QtCore.QModelIndex())
-            self.modelGas.setData(self.modelGas.index(ii, 0, QtCore.QModelIndex()), QtGui.QColor(dataGui.dataTabGasComponents[ii][1]), QtCore.Qt.DecorationRole)
-            self.modelGas.setData(self.modelGas.index(ii, 0, QtCore.QModelIndex()), dataGui.dataTabGasComponents[ii][0])
-            self.modelGas.setData(self.modelGas.index(ii, 1, QtCore.QModelIndex()), float(0.0))
-
+            self.modelGas.setData(
+                self.modelGas.index(ii, 0, QtCore.QModelIndex()),
+                QtGui.QColor(dataGui.dataTabGasComponents[ii][1]),
+                QtCore.Qt.DecorationRole)
+            self.modelGas.setData(
+                self.modelGas.index(ii, 0, QtCore.QModelIndex()),
+                dataGui.dataTabGasComponents[ii][0])
+            self.modelGas.setData(
+                self.modelGas.index(ii, 1, QtCore.QModelIndex()),
+                float(0.0))
 
     def initGraphicsViewGas(self):
         """Gui: init pie chart gas"""
@@ -1316,62 +1342,59 @@ class GPCMainWindow(QtWidgets.QMainWindow):
         self.ui.graphicsViewGas.show()
         self.ui.graphicsViewGas.setEnabled(True)
 
-     ## gas
-
     @QtCore.pyqtSlot()
     def newGasComponents(self):
 
-        dataGui.newGasComponents(self.modelGas)        
+        dataGui.newGasComponents(self.modelGas)
 
-   
     @QtCore.pyqtSlot()
     def readGasComponents(self):
 
-        dataGui.readGasComponents(self,self.modelGas)
-
+        dataGui.readGasComponents(self, self.modelGas)
 
     @QtCore.pyqtSlot()
     def saveComponents(self):
 
-        dataGui.saveComponents(self,self.modelGas)           
-        
-    ## update routines: coupling to data model (set/clear)
+        dataGui.saveComponents(self, self.modelGas)
 
     @QtCore.pyqtSlot()
     def updateGas(self):
-        
+
         # get gas composition
-        (gasComposition,idStatus) = dataGui.getGasComponents(self.modelGas)
+        (gasComposition, idStatus) = dataGui.getGasComponents(self.modelGas)
 
         # pie chart gas
-        self.graphicsSceneGas.updatePieChart(gasComposition)  
+        self.graphicsSceneGas.updatePieChart(gasComposition)
 
         # label status gas
-        self.updateLabelStatusGas(idStatus,gasComposition)
+        self.updateLabelStatusGas(idStatus, gasComposition)
 
         # trick: block gas components name change
         dataGui.resetGasComponentsName(self.modelGas)
 
         # Data model
-        if (idStatus==parameters.ID_STATUSGAS_OK):
+        if (idStatus == parameters.ID_STATUSGAS_OK):
             self.ui.buttonApplyGasComp.setEnabled(True)
             self.gasComposition = gasComposition
         else:
-            self.ui.buttonApplyGasComp.setEnabled(False) 
+            self.ui.buttonApplyGasComp.setEnabled(False)
             self.gasComposition = {}
-   
-    def updateLabelStatusGas(self,idStatus,gasComposition):
 
-        if (idStatus==parameters.ID_STATUSGAS_OK):
+    def updateLabelStatusGas(self, idStatus, gasComposition):
+
+        if (idStatus == parameters.ID_STATUSGAS_OK):
             messg = "Gas composition is complete."
-        elif(idStatus==parameters.ID_STATUSGAS_FRACTION_OUTRANGE):
+        elif (idStatus == parameters.ID_STATUSGAS_FRACTION_OUTRANGE):
             messg = "Gas composition contains invalid fractions."
-        elif(idStatus==parameters.ID_STATUSGAS_FRACTIONSUM_OUTRANGE):
-            messg = "Gas composition incomplete: The sum of \n fractions is " + str("{0:.2f}".format(sum(gasComposition.values()))) + " mol%."
+        elif (idStatus == parameters.ID_STATUSGAS_FRACTIONSUM_OUTRANGE):
+            messg = (
+                "Gas composition incomplete: The sum of \n fractions is " +
+                str("{0:.2f}".format(sum(gasComposition.values())))
+                + " mol%.")
 
-        self.ui.labelStatusGas.setText(str(messg))    
+        self.ui.labelStatusGas.setText(str(messg))
 
     @QtCore.pyqtSlot()
     def applyGasComposition(self):
 
-            self.gasobj = calc.Gas(self.gasComposition,"de0")
+        self.gasobj = calc.Gas(self.gasComposition, "de0")
